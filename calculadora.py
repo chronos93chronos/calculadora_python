@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from tkinter import * # se importa la libreria TKINTER para interfas grafica
+import parser # se importa para poder usarla en la funcion "calcular"para realizar las operaciones aritmeticas
 
 root = Tk()
 root.title("calculadora") # se asigna nombre a la ventana
@@ -27,11 +28,33 @@ def get_operador(operator):
 def clean_display():
     display.delete(0, END)
 #____________________________________________
-    
 
+# funcion para borrar un valor dentro de la pagina del boton (<=)
+def undo ():
+    display_state = display.get()
+    if len(display_state):
+        display_new_state = display_state[:-1]
+        clean_display()
+        display.insert(0,display_new_state)
+    else: 
+        clean_display()
+        display.insert(0, 'error')
+#___________________________________________________
 
+#funcion para poder calcular las operaciones aritmeticas ne un plano generico y no solo por simbolo individual.
 
-
+def calcular():
+    display_state = display.get()
+    try:
+        math_expression = parser.expr(display_state).compile()
+        result = eval(math_expression)
+        clean_display()
+        display.insert(0, result)
+    except expression as identifier:
+        clean_display()
+        display.insert(0, 'error')
+#____________________________________________________      
+        
 #botones numericos
 Button(root, text= "1",command=lambda:get_number(1)).grid(row =2, column=0,sticky=W+E)
 Button(root, text= "2",command=lambda:get_number(2)).grid(row =2, column=1,sticky=W+E)
@@ -57,11 +80,11 @@ Button(root, text= "*",command = lambda:get_operador("*")).grid(row =4, column=3
 Button(root, text= "/",command = lambda:get_operador("/")).grid(row =5, column=3,sticky=W+E)
 
 #botones otras acciones
-Button(root, text= "<=").grid(row =2, column=4,sticky=W+E,columnspan = 2)
+Button(root, text= "<=",command = lambda:undo()).grid(row =2, column=4,sticky=W+E,columnspan = 2)
 Button(root, text= "exp",command = lambda:get_operador("**")).grid(row =3, column=4,sticky=W+E)
 Button(root, text= "^2",command = lambda:get_operador("**2")).grid(row =3, column=5,sticky=W+E)
 Button(root, text= "(",command = lambda:get_operador("(")).grid(row =4, column=4,sticky=W+E)
 Button(root, text= ")",command = lambda:get_operador(")")).grid(row =4, column=5,sticky=W+E)
-Button(root, text= "=").grid(row =5, column=4,sticky=W+E,columnspan = 2)
+Button(root, text= "=",command = lambda:calcular()).grid(row =5, column=4,sticky=W+E,columnspan = 2)
 
 root.mainloop()
